@@ -1,0 +1,138 @@
+body {
+  font-family: 'Poppins';
+  background-color: #212121;
+  padding: 5px;
+  height: 100vh;
+}
+
+header {
+  height: 50px;
+  font-size: 30px;
+  color: #fff;
+}
+
+#time {
+  float: right;
+}
+
+#hello {
+  float: left;
+}
+
+@-webkit-keyframes opacity {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@-o-keyframes opacity {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@-moz-keyframes opacity {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes opacity {
+
+  0%,
+  100% {
+    opacity: 0;
+  }
+
+  50% {
+    opacity: 1;
+  }
+}
+
+#command-area {
+  position: absolute;
+  margin: auto;
+  top: 0; left: 0; bottom: 0; right: 0;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 13px;
+  color: white;
+  height: 300px;
+  width: 600px;
+  background-color: #232323;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1);
+}
+
+#command-area:hover {
+  box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
+}
+
+#command-list {
+  height: 286px;
+  overflow-y: scroll;
+  color: rgba(250, 250, 250, 0.8);
+}
+
+.command-list-item {
+  width: 100%;
+}
+
+#command {
+  display: flex;
+  height: 16px;
+}
+
+#command i {
+  color: #18ffff;
+  justify-content: flex-start;
+  margin-top: 3px;
+  -webkit-animation: opacity 2s linear 0s infinite;
+  animation: opacity 2s linear 0s infinite;
+}
+
+#command input {
+  font-family: 'Roboto Mono', monospace;
+  color: #fff;
+  background-color: transparent;
+  border: none;
+  margin-left: 8px;
+  justify-content: flex-end;
+  width: 100%;
+}
+
+#command input:focus {
+  outline: none;
+}
+
+#command-list::-webkit-scrollbar-track {
+  background-color: #232323;
+}
+
+#command-list::-webkit-scrollbar {
+  width: 4px;
+  background-color: rgba(250, 250, 250, 0.8);
+}
+
+#command-list::-webkit-scrollbar-thumb {
+  background-color: #0ae;
+}
