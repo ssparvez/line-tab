@@ -1,14 +1,14 @@
 {
     "name": "devTab",
-    "description" : "A new tab page inspired by material design",
-    "version": "1.0",
+    "description" : "A simple new tab page built for developers",
+    "version": "0.0.0.1",
     "manifest_version": 2,
     "chrome_url_overrides" : {
       "newtab": "index.html"
     },
     "permissions": [
       "bookmarks",
-      "identity",
-      "tabs"
+      "tabs",
+      "storage"
     ]
   }
