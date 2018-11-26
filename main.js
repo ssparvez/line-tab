@@ -11,34 +11,33 @@ init();
 function init() {
     getSettings();
     getBookmarks();
-
-    document.body.setAttribute("class", "active");
     startTime();
     createEventHandlers();
 }
 
 function getSettings() {
     let userInput = document.querySelector("#hello input");
-    chrome.storage.local.get(["username", "showUsername", "showTime", "militaryTime", "showCommandArea"], values => {
+    chrome.storage.local.get(["username", "showUsername", "showTime", "militaryTime"], values => {
         if(values.showUsername === false) {
             document.getElementById("hello").style.display = "none"
-            document.querySelector(".settings-menu ul li:nth-child(1)").innerHTML = "Show Name";
+            document.querySelector("#name-toggle").innerHTML = "Show Name";
             showUsername = false;
         }
-        else userInput.value = values.username
+        else userInput.value = values.username ? values.username : '';
         if(values.showTime === false) {
             document.getElementById("time").style.display = "none"
-            document.querySelector(".settings-menu ul li:nth-child(2)").innerHTML = "Show Time";
+            document.querySelector("#time-toggle").innerHTML = "Show Time";
             showTime = false;
         }
         if(values.militaryTime) militaryTime = values.militaryTime;
+        document.querySelector('header').setAttribute("class", "active");
+        document.querySelector('footer').setAttribute("class", "active");
     });
 }
 
 function getBookmarks() {
     // get bookmarks
     chrome.bookmarks.getTree(response => {
-        console.log(response[0].children[0].children);
         bookmarks = response[0].children[0].children;
     });
 }
@@ -57,28 +56,28 @@ function startTime() {
     minutes = (minutes < 10) ? ("0" + minutes) : minutes;
     //seconds = checkTime(seconds);
     document.getElementById("time").innerHTML = hours + ":" + minutes /*+ ":" + seconds */ + (militaryTime ? "" : " " + ampm);
-    const timer = setTimeout(startTime, 500);
+    const timer = setTimeout(startTime, 100);
 }
 
 function createEventHandlers() {
-    let userInput = document.querySelector("#hello input");
+    const userInput = document.querySelector("#hello input");
     userInput.addEventListener("keyup", () => {
         chrome.storage.local.set({ "username": userInput.value }, () => {});
     });
 
-    let commandInput = document.querySelector("#command input");
-    commandInput.addEventListener("keypress", () => keyPress(commandInput));
-    commandInput.addEventListener("keydown", () => keyDown(commandInput));
+    const commandInput = document.querySelector("#command-bar input");
+    commandInput.addEventListener("keypress", () => processCommand(commandInput));
+    commandInput.addEventListener("keydown", () => traverseHistory(commandInput));
     commandInput.addEventListener("focus", () => commandInput.placeholder = "Type \"help\" for more options");
     commandInput.addEventListener("blur", () => commandInput.placeholder = "Hit [tab] to quickly type");
 
-    let settingsButton = document.querySelector('footer i');
-    let settingsMenu = document.querySelector('footer .settings-menu');
+    const settingsButton = document.querySelector('footer i');
+    const settingsMenu = document.querySelector('footer .settings-menu');
     settingsButton.addEventListener("click", () => settingsMenu.classList.add('active'));
 
     // if clicked outside settings menu
-    let bodyClickEvent = document.body.addEventListener("click", event => {
-        if (!settingsMenu.contains(event.target) && !settingsButton.contains(event.target)) { // or use: event.target.closest(selector) === null
+    const bodyClickEvent = document.body.addEventListener("click", event => {
+        if(!settingsMenu.contains(event.target) && !settingsButton.contains(event.target)) { // or use: event.target.closest(selector) === null
             settingsMenu.classList.remove('active');
             document.removeEventListener('click', bodyClickEvent);
         }
@@ -90,7 +89,6 @@ function createEventHandlers() {
         chrome.storage.local.set({ "showUsername": showUsername }, () => {});
         settingsOptions[0].innerHTML = (showUsername? "Hide" : "Show") + " Name";
         document.getElementById("hello").style.display = showUsername? "block" : "none";
-
     })
 
     settingsOptions[1].addEventListener("click", () => {
@@ -108,152 +106,138 @@ function createEventHandlers() {
 
 }
 
-async function keyPress(commandInput) {
-    if(event.key === "Enter" && commandInput.value.trim() != "") {
-        let commandTokens = commandInput.value.split(" ");
-        console.log(commandTokens)
-        let commandSuccess = true;
-        let commandResponse = "";
-        if(commandTokens[0] == "ls") {
-            console.log(bookmarks);
+function processCommand(input) {
+    if(event.key === "Enter" && input.value.trim() != "") {
+        let tokens = input.value.split(" ");
+        let output = { response: '', success: true };
+        if(tokens[0] == "ls") {
             for(let entry of bookmarks) {
                 if(!entry.children) {
-                    commandResponse += "<a style=\"color: #F3F7A2;\" href=\"" + entry.url + "\">" + entry.title + "</a>\t"
+                    output.response += "<a style=\"color: #F3F7A2;\" href=\"" + entry.url + "\">" + entry.title + "</a>\t"
                 }
             }
         }
-        else if(commandTokens[0] == "rm") {
-            let found = false;
-            for(let i = 0; i < bookmarks.length; i++) {
-                if(!bookmarks[i].children && bookmarks[i].title.toLowerCase() == commandTokens[1].toLowerCase()) {
-                    if(bookmarks[i].children) chrome.bookmarks.removeTree(bookmarks[i].id);
-                    else chrome.bookmarks.remove(bookmarks[i].id);
-                    bookmarks.splice(i, 1);
-                    found = true;
-                    break;
-                }
+        else if(tokens[0] == "rm") {
+            let bookmark = getBookmark(tokens[1]);
+            if(bookmark != null) { 
+                chrome.bookmarks.remove(bookmark.id);
+                bookmarks = bookmarks.filter(currentBookmark => currentBookmark.id == bookmark.id);
             }
-            if(!found) {
-                commandSuccess = false;
-                commandResponse += "Couldn't find bookmark";
-            }
+            else output = { response: "Couldn't find bookmark", success: false };
         }
-        else if(commandTokens[0] == "exit") {
+        else if(tokens[0] == "exit") {
             chrome.tabs.getCurrent(tab => chrome.tabs.remove(tab.id))
         }
-        else if(commandTokens[0] == "help") {
-            commandResponse += "Welcome to devTab! A fun way to browse.";
-            commandResponse += "\n\nAvailable commands:";
-            commandResponse += "\nhelp\t\t\t\tbrings up this list"
-            commandResponse += "\nls\t\t\t\tlists your primary bookmarks"
-            commandResponse += "\nrm &lt;bookmark&gt;\t\t\tremoves the specified bookmark"
-            commandResponse += "\nopen [-n] &lt;url&gt;\t\t\tlaunches the url typed in"
-            commandResponse += "\nchrome [-n] &lt;page&gt;\t\topens the chrome page"
-            commandResponse += "\nsearch [-n] &lt;keywords&gt;...\tsearches the specified keywords on Google"
-            commandResponse += "\nexit\t\t\t\tcloses this tab"
-            commandResponse += "\n\nOptions:"
-            commandResponse += "\n-n\t\t\t\t Runs command in a new tab"
+        else if(tokens[0] == "help") {
+            output.response = createHelpResponse();
         }
-        else if(commandTokens[0] == "search") {
-            if(commandTokens[1] == '-n') {
-                commandTokens.splice(0, 2);
-                chrome.tabs.create({ url:  "http://www.google.com/search?q=" + commandTokens.join("+")})     
-            }
-            else {
-                commandTokens.splice(0, 1);
-                chrome.tabs.update({ url:  "http://www.google.com/search?q=" + commandTokens.join("+")}) 
-            }
+        else if(tokens[0] == "search") {
+            tokens.splice(0, tokens[1] == '-n' ? 2 : 1);
+            if(tokens[1] == '-n') chrome.tabs.create({ url:  "http://www.google.com/search?q=" + tokens.join("+")})     
+            else chrome.tabs.update({ url:  "http://www.google.com/search?q=" + tokens.join("+")}) 
         }
-        else if(commandTokens[0] == "open") {
-            if(commandTokens[1] == '-n') {
-                chrome.tabs.create({url: "http://" + commandTokens[2]}); 
-            }
-            else {
-                chrome.tabs.update({url: "http://" + commandTokens[1]}); 
-            }
+        else if(tokens[0] == "open") {
+            if(tokens[1] == '-n') chrome.tabs.create({url: "http://" + tokens[2]}); 
+            else chrome.tabs.update({url: "http://" + tokens[1]}); 
         }
-        else if(commandTokens[0] == "chrome") {
-            if(commandTokens[1] == '-n') {
-                chrome.tabs.create({ url:  "chrome://" + commandTokens[2]})            
-            }
-            else {
-                chrome.tabs.update({ url:  "chrome://" + commandTokens[1]})            
-            }            
+        else if(tokens[0] == "chrome") {
+            if(tokens[1] == '-n') chrome.tabs.create({ url:  "chrome://" + tokens[2]});
+            else chrome.tabs.update({ url:  "chrome://" + tokens[1]});        
+        }
+        else if(tokens[0] == "clear") {
+            document.getElementById("command-list").innerHTML = "";
         }
         // user can just click on bookmark from ls
-       /* else if(commandTokens[0] == "bookmark") {
-            let found = false;
-            for(let i = 0; i < bookmarks.length; i++) {
-                if(!bookmarks[i].children && bookmarks[i].title.toLowerCase() == commandTokens[1].toLowerCase()) {
-                    chrome.tabs.update({ url: bookmarks[i].url})
-                    found = true;
-                    break;
-                }
-            }
-            if(!found) {
-                commandSuccess = false;
-                commandResponse += "Couldn't find bookmark";
-            }
-        }*/
-        else {
-            commandSuccess = false;
-            commandResponse = commandTokens[0] + " is not a command";
-        }
+       else if(tokens[0] == "bookmark") {
+            let page = tokens[1] == '-n' ? tokens[2] : tokens[1];
 
-        addCommandElements(commandInput, commandResponse, commandSuccess);
-        storeCommand(commandInput);
+            let bookmark = getBookmark(page);
+            if(bookmark != null) {
+                if(tokens.length > 2) chrome.tabs.create({ url: bookmark.url})
+                else chrome.tabs.update({ url: bookmark.url})
+            }
+            else output = { response: "Couldn't find bookmark", success: false };
+        }
+        else output = { response: tokens[0] + " is not a command", success: false };
+
+        addCommandElements(input, output);
+        storeCommand(input);
     }
 }
 
-function storeCommand(commandInput) {
-    // store command
-    commandHistory.push(commandInput.value);
-    commandHistoryIndex = commandHistory.length;   
-    commandInput.value = "";
+function createHelpResponse() {
+    let response = "Welcome to devTab! A fun way to browse.";
+    response += "\n\nAvailable commands:";
+    response += "\nhelp\t\t\t\tbrings up this list"
+    response += "\nls\t\t\t\tlists your primary bookmarks"
+    response += "\nrm &lt;bookmark&gt;\t\t\tremoves the specified bookmark"
+    response += "\nopen [-n] &lt;url&gt;\t\t\tlaunches the url typed in"
+    response += "\nbookmark [-n] &lt;name&gt;\t\tlaunches the bookmark page"
+    response += "\nchrome [-n] &lt;page&gt;\t\topens the chrome page"
+    response += "\nsearch [-n] &lt;keywords&gt;...\tsearches the specified keywords on Google"
+    response += "\nclear\t\t\t\tremoves all previous output"
+    response += "\nexit\t\t\t\tcloses this tab"
+    response += "\n\nOptions:"
+    response += "\n-n\t\t\t\t Runs command in a new tab"
+    return response;
 }
 
-function addCommandElements(commandInput, commandResponse, commandSuccess) {
-    const commandList = document.getElementById("command-list");
-    let isScrolledToBottom = commandList.scrollHeight - commandList.clientHeight <= commandList.scrollTop + 1;
-    console.log(commandList.scrollHeight - commandList.clientHeight,  commandList.scrollTop + 1);
+function getBookmark(name) {
+    for(let bookmark of bookmarks) {
+        if(!bookmark.children && bookmark.title.toLowerCase() == name.toLowerCase()) {
+            return bookmark;
+        }
+    }
+    return null;
+}
+
+function storeCommand(input) {
+    // store command
+    commandHistory.push(input.value);
+    commandHistoryIndex = commandHistory.length;   
+    input.value = "";
+}
+
+function addCommandElements(input, output) {
+    const list = document.getElementById("command-list");
+    const isScrolledToBottom = list.scrollHeight - list.clientHeight <= list.scrollTop + 1;
 
     // add command item node
-    const commandItem = document.createElement("div");
-    commandItem.className = "item";
-    commandItem.innerHTML = commandInput.value;
-    commandItem.style.color = commandSuccess ? "#0fa" : "#f07";
-    commandList.appendChild(commandItem);
+    const command = document.createElement("div");
+    command.className = "command";
+    command.innerHTML = input.value;
+    command.style.color = output.success ? "#0fa" : "#f07";
+    list.appendChild(command);
 
     // add command response
-    console.log(commandResponse)
-    const commandItemResponse = document.createElement("div");
-    commandItemResponse.className = "response";
-    commandItemResponse.innerHTML = commandSuccess ? commandResponse : ("- devTab: " + commandResponse);
-    commandList.appendChild(commandItemResponse);
+    const response = document.createElement("div");
+    response.className = "response";
+    response.innerHTML = output.success ? output.response : ("- devTab: " + output.response);
+    list.appendChild(response);
 
     // scroll to bottom if isScrolledToBotto
-    if(isScrolledToBottom) commandList.scrollTop = commandList.scrollHeight - commandList.clientHeight;
-    else commandList.scroll({top: commandList.scrollHeight, behavior: 'smooth' })
+    if(isScrolledToBottom) list.scrollTop = list.scrollHeight - list.clientHeight;
+    else list.scroll({top: list.scrollHeight, behavior: 'smooth' })
 }
 
-function keyDown(commandInput) {
+function traverseHistory(input) {
     if(commandHistory.length > 0) {
         if(event.key == "ArrowUp") {
             event.preventDefault();
             if(commandHistoryIndex > 0) {
-                commandInput.value = commandHistory[commandHistoryIndex - 1];
+                input.value = commandHistory[commandHistoryIndex - 1];
                 commandHistoryIndex--;
             }
         }
         else if(event.key == "ArrowDown") {
             event.preventDefault();
             if(commandHistoryIndex < commandHistory.length - 1) {
-                commandInput.value = commandHistory[commandHistoryIndex + 1];
+                input.value = commandHistory[commandHistoryIndex + 1];
                 commandHistoryIndex++;
             }
             else if(commandHistoryIndex == commandHistory.length - 1) {
                 commandHistoryIndex = commandHistory.length;
-                commandInput.value = "";
+                input.value = "";
             }
         }
     }   

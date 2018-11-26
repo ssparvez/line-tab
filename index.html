@@ -17,32 +17,31 @@
   <header>
     <div id="hello">
       Hello, 
-      <input type="text" placeholder="{ Your Name }" maxlength="15" tabindex="-1">
+      <input type="text" placeholder="{ name }" maxlength="20" tabindex="-1">
     </div>
     <div id="time"></div>
   </header>
-  <div class="content">
-      <section id="command-area">
-          <div id="command-list">
-          
-          </div>
-          <div id="command">
+
+  <section>
+      <div id="command-area">
+          <div id="command-list"></div>
+          <div id="command-bar">
             <i class="fas fa-chevron-right"></i>
             <input type="text" autofocus placeholder="Hit [tab] to quickly type">
           </div>
       </section>
-  </div> 
+  </section> 
   
   <footer>
     <div class="settings-menu">
       <ul>
-        <li>Hide Name</li>
-        <li>Hide Time</li>
-        <li>24hr Time</li>
+        <li id="name-toggle">Hide Name</li>
+        <li id="time-toggle">Hide Time</li>
+        <li id="military-toggle">24hr Time</li>
         <!--<li>Light Mode</li>-->
       </ul>
     </div>
-    <i class="fas fa-wrench"></i>
+    <i id="settings-button" class="fas fa-wrench"></i>
   </footer>
   <script type="text/javascript" src="main.js"></script>
 </body>
