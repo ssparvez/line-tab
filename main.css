@@ -1,5 +1,19 @@
+body[data-dark-mode='false'] {
+  background-color: #FAFAFA !important;
+  color: #212121 !important;
+}
+body[data-dark-mode='false'] header,
+body[data-dark-mode='false'] .hello input,
+body[data-dark-mode='false'] footer {
+  color: #212121 !important;
+}
+body[data-dark-mode='false'] .command-area,
+body[data-dark-mode='false'] .settings-menu {
+  background-color: #FAFAFA;
+}
+
 body {
-  font-family: 'Poppins';
+  font-family: 'Poppins', sans-serif;
   font-weight: 300;
   background-color: #212121;
   margin: 0px;
@@ -30,35 +44,28 @@ section {
 
 footer {
   height: 50px;
+  color: #fff; 
 }
 
-#time {
+.time {
   float: right;
 }
 
-#hello {
+.hello {
   float: left;
 }
 
-#hello input {
+.hello input {
   background-color: inherit;
   border: none;
   color: #fff;
-  font-family: 'Poppins';
+  font-family: 'Poppins', sans-serif;
   font-size: 20px;
   outline: none;
   width: 223px;
 }
 
-#settings-button {
-  color: white; 
-  font-size: 20px; 
-  float: right; 
-  cursor: pointer; 
-  margin-top: 20px;
-}
-
-#command-area {
+.command-area {
   position: absolute;
   margin: auto;
   top: 0; left: 0; bottom: 0; right: 0;
@@ -81,37 +88,37 @@ footer {
 
 }
 
-header.active + section #command-area {
+header.active + section .command-area {
   -webkit-transform: scale(1);
 }
 
-#command-area:hover {
+.command-area:hover {
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
-#command-list {
+.command-list {
   height: 334px;
   overflow-y: scroll;
   word-wrap: break-word;
   color: rgba(250, 250, 250, 0.7);
 }
 
-#command-list .command {
+.command-list .command {
   width: 100%;
   font-weight: 700;
 }
 
-#command-list .response {
+.command-list .response {
   white-space: pre-wrap;
   font-weight: 700;
 }
 
-#command-bar {
+.command-bar {
   display: flex;
   height: 16px;
 }
 
-#command-bar i {
+.command-bar i {
   color: #18ffff;
   justify-content: flex-start;
   margin-top: 2px;
@@ -119,7 +126,7 @@ header.active + section #command-area {
   animation: opacity 2s linear 0s infinite;
 }
 
-#command-bar input {
+.command-bar input {
   font-family: 'Roboto Mono', monospace;
   font-size: 13px;
   font-weight: 700;
@@ -131,21 +138,27 @@ header.active + section #command-area {
   width: 100%;
 }
 
-#command-bar input:focus {
+.command-bar input:focus {
   outline: none;
 }
 
-#command-list::-webkit-scrollbar-track {
-  background-color: #232323;
+.command-list::-webkit-scrollbar-track {
+  background-color: transparent;
 }
 
-#command-list::-webkit-scrollbar {
+.command-list::-webkit-scrollbar {
   width: 4px;
-  background-color: rgba(250, 250, 250, 0.8);
 }
 
-#command-list::-webkit-scrollbar-thumb {
+.command-list::-webkit-scrollbar-thumb {
   background-color: #18ffff;
+}
+
+.settings-button {
+  font-size: 20px; 
+  float: right; 
+  cursor: pointer; 
+  margin-top: 20px;
 }
 
 .settings-menu {
@@ -153,7 +166,6 @@ header.active + section #command-area {
   bottom: 40px;
   right: 40px;
   z-index: 1000;
-  background-color: #fff;
   background-color: #232323;
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);  
@@ -237,41 +249,41 @@ header.active + section #command-area {
 /* Media queries */
 
 @media only screen and (max-width: 650px) {
-  #command-area {
+  .command-area {
     width: 400px !important;
   }
 }
 
 @media only screen and (max-width: 450px) {
-  #command-area {
+  .command-area {
     width: 300px !important;
   }
 }
 
 @media only screen and (max-height: 450px) {
-  #command-area {
+  .command-area {
     height: 250px !important;
   }
-  #command-list {
+  .command-list {
     height: 234px !important;
   }
 }
 
 @media only screen and (max-height: 350px) {
-  #command-area {
+  .command-area {
     height: 150px !important;
   }
-  #command-list {
+  .command-list {
     height: 134px !important;
   }
 }
 
 @media only screen and (max-height: 250px) {
-  #command-area {
+  .command-area {
     height: 32px !important;
     padding-bottom: 0px !important;
   }
-  #command-list {
+  .command-list {
     display: none;
   }
 }

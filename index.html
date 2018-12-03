@@ -15,17 +15,17 @@
 
 <body>
   <header>
-    <div id="hello">
+    <div class="hello">
       Hello, 
       <input type="text" placeholder="{ name }" maxlength="20" tabindex="-1">
     </div>
-    <div id="time"></div>
+    <div class="time"></div>
   </header>
 
   <section>
-      <div id="command-area">
-          <div id="command-list"></div>
-          <div id="command-bar">
+      <div class="command-area">
+          <div class="command-list"></div>
+          <div class="command-bar">
             <i class="fas fa-chevron-right"></i>
             <input type="text" autofocus placeholder="Hit [tab] to quickly type">
           </div>
@@ -35,14 +35,18 @@
   <footer>
     <div class="settings-menu">
       <ul>
-        <li id="name-toggle">Hide Name</li>
-        <li id="time-toggle">Hide Time</li>
-        <li id="military-toggle">24hr Time</li>
-        <!--<li>Light Mode</li>-->
+        <li class="name-toggle">Hide Name</li>
+        <li class="time-toggle">Hide Time</li>
+        <li class="military-toggle">24hr Time</li>
+        <li class="theme-toggle">
+          Light Mode
+          <i class="fas fa-lock" style="color: #FFD740; margin-left: 8px;"></i>
+        </li>
       </ul>
     </div>
-    <i id="settings-button" class="fas fa-wrench"></i>
+    <i class="fas fa-wrench settings-button"></i>
   </footer>
+  <script type="text/javascript" src="vendor/buy.js"></script>
   <script type="text/javascript" src="main.js"></script>
 </body>
 
