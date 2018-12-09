@@ -12,8 +12,14 @@ init();
 function init() {
 	google.payments.inapp.getSkuDetails({
 		'parameters': {'env': 'dev'},
-		'success': () => console.log('success'),
-		'failure': () => console.log('failure')
+		'success': (response) => {
+			console.log('success');
+			console.log(response);
+		},
+		'failure': (response) => {
+			console.log('failure');
+			console.log(response);
+		}
 	});
 	getSettings();
 	getBookmarks();
@@ -213,7 +219,7 @@ function processCommand(input) {
 }
 
 function createHelpResponse() {
-	let response = "Welcome to devTab! A fun way to browse.";
+	let response = "Welcome to lineTab! A fun way to browse.";
 	response += "\n\nAvailable commands:";
 	response += "\nhelp\t\t\t\tbrings up this list"
 	response += "\nls\t\t\t\tlists your primary bookmarks"
@@ -259,7 +265,7 @@ function addCommandElements(input, output) {
 	// add command response
 	const response = document.createElement("div");
 	response.className = "response";
-	response.innerHTML = output.success ? output.response : ("- devTab: " + output.response);
+	response.innerHTML = output.success ? output.response : ("- lineTab: " + output.response);
 	list.appendChild(response);
 
 	// scroll to bottom if isScrolledToBotto
