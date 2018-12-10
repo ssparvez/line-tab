@@ -1,14 +1,14 @@
-body[data-dark-mode='false'] {
+body[data-theme='light'] {
   background-color: #FAFAFA !important;
   color: #212121 !important;
 }
-body[data-dark-mode='false'] header,
-body[data-dark-mode='false'] .hello input,
-body[data-dark-mode='false'] footer {
+body[data-theme='light'] header,
+body[data-theme='light'] .hello input,
+body[data-theme='light'] footer {
   color: #212121 !important;
 }
-body[data-dark-mode='false'] .command-area,
-body[data-dark-mode='false'] .settings-menu {
+body[data-theme='light'] .command-area,
+body[data-theme='light'] .settings-menu {
   background-color: #FAFAFA;
 }
 
@@ -213,10 +213,16 @@ header.active + section .command-area {
   opacity: 0.4
 }
 
-.settings-menu li i {
-  margin-top: 3px;
-  width: 24px
+.settings-menu li i.locked {
+  color: #FFD740; 
+  margin-left: 8px;
+  display: none;
 }
+
+.settings-menu li i.locked.active {
+  display: inline;
+}
+
 
 .settings-menu hr {
   margin: 0px 12px;

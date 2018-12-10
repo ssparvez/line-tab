@@ -5,26 +5,38 @@ let showUsername = true;
 let showTime = true;
 let showCommandArea = true;
 let militaryTime = false;
-let darkMode = true;
+let hasLightMode = false;
+let theme = 'dark';
 
 init();
 
 function init() {
-	google.payments.inapp.getSkuDetails({
-		'parameters': {'env': 'dev'},
-		'success': (response) => {
-			console.log('success');
-			console.log(response);
-		},
-		'failure': (response) => {
-			console.log('failure');
-			console.log(response);
-		}
-	});
+	getTheme();
 	getSettings();
 	getBookmarks();
 	startTime();
 	createEventHandlers();
+}
+
+function getTheme() {
+	google.payments.inapp.getSkuDetails({
+		'parameters': {'env': 'prod'},
+		'sku': 'com.ssparvez.dev_tab.light_mode',
+		'success': (response) => {
+			console.log(response);
+			console.log('success');
+		},
+		'failure': (response) => {
+			console.log(response);
+			console.log('failure');
+		}
+	});
+
+	google.payments.inapp.getPurchases({
+		'parameters': {'env': 'prod'},
+		'success': (response) => console.log(response),
+		'failure': (response) => console.log(response)
+	});
 }
 
 function getSettings() {
@@ -124,12 +136,27 @@ function createEventHandlers() {
 	})
 
 	settingsOptions[3].addEventListener("click", () => {
-		darkMode = !darkMode;
-		chrome.storage.local.set({
-			"darkMode": darkMode
-		}, () => {});
-		settingsOptions[3].firstChild.innerHTML = (darkMode ? "Light" : "Dark") + " Mode";
-		document.body.dataset.darkMode = darkMode;
+		if(hasLightMode) {
+			chrome.storage.local.set({
+				"theme": "light"
+			}, () => {});
+			theme = theme == "light" ? "dark" : "light";
+			settingsOptions[3].firstChild.innerHTML = (theme == "light" ? "Dark" : "Light") + " Mode";
+			document.body.dataset.theme = theme;
+		}
+		else {
+			// buy prompt
+			let sku = "com.ssparvez.dev_tab.light_mode";
+			google.payments.inapp.buy({
+				'parameters': {'env': 'prod'},
+				'sku': sku,
+				'success': () => {
+					// no need to set in local storage because of payment check right?
+					hasLightMode = true;
+				},
+				'failure': () => console.log('failure')
+			});
+		}
 	});
 }
 
