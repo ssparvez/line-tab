@@ -19,6 +19,11 @@ function init() {
 }
 
 function getTheme() {
+	chrome.storage.local.get("theme", value => {
+		theme = value;
+		document.querySelector(".theme-toggle").firstChild.innerHTML = (theme == "light" ? "Dark" : "Light") + " Mode";
+		document.body.dataset.theme = theme;
+	});
 	google.payments.inapp.getSkuDetails({
 		'parameters': {'env': 'prod'},
 		'sku': 'com.ssparvez.dev_tab.light_mode',
@@ -34,7 +39,9 @@ function getTheme() {
 
 	google.payments.inapp.getPurchases({
 		'parameters': {'env': 'prod'},
-		'success': (response) => console.log(response),
+		'success': (response) => {
+			if(!response.details.length > 0) hasLightMode = true;
+		},
 		'failure': (response) => console.log(response)
 	});
 }
@@ -60,9 +67,7 @@ function getSettings() {
 
 function getBookmarks() {
 	// get bookmarks
-	chrome.bookmarks.getTree(response => {
-		bookmarks = response[0].children[0].children;
-	});
+	chrome.bookmarks.getTree(response => bookmarks = response[0].children[0].children);
 }
 
 function startTime() {
@@ -85,9 +90,7 @@ function startTime() {
 function createEventHandlers() {
 	const userInput = document.querySelector(".hello input");
 	userInput.addEventListener("keyup", () => {
-		chrome.storage.local.set({
-			"username": userInput.value
-		}, () => {});
+		chrome.storage.local.set({ "username": userInput.value }, () => {});
 	});
 
 	const commandInput = document.querySelector(".command-bar input");
@@ -111,9 +114,7 @@ function createEventHandlers() {
 	const settingsOptions = document.querySelectorAll(".settings-menu ul li");
 	settingsOptions[0].addEventListener("click", () => {
 		showUsername = !showUsername;
-		chrome.storage.local.set({
-			"showUsername": showUsername
-		}, () => {});
+		chrome.storage.local.set({ "showUsername": showUsername }, () => {});
 		settingsOptions[0].innerHTML = (showUsername ? "Hide" : "Show") + " Name";
 		document.querySelector(".hello").style.display = showUsername ? "block" : "none";
 	})
@@ -150,10 +151,7 @@ function createEventHandlers() {
 			google.payments.inapp.buy({
 				'parameters': {'env': 'prod'},
 				'sku': sku,
-				'success': () => {
-					// no need to set in local storage because of payment check right?
-					hasLightMode = true;
-				},
+				'success': () => hasLightMode = true,
 				'failure': () => console.log('failure')
 			});
 		}
