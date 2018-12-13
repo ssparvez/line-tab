@@ -24,23 +24,15 @@ function getTheme() {
 		document.querySelector(".theme-toggle").firstChild.innerHTML = (theme == "light" ? "Dark" : "Light") + " Mode";
 		document.body.dataset.theme = theme;
 	});
-	google.payments.inapp.getSkuDetails({
-		'parameters': {'env': 'prod'},
-		'sku': 'com.ssparvez.dev_tab.light_mode',
-		'success': (response) => {
-			console.log(response);
-			console.log('success');
-		},
-		'failure': (response) => {
-			console.log(response);
-			console.log('failure');
-		}
-	});
 
 	google.payments.inapp.getPurchases({
 		'parameters': {'env': 'prod'},
 		'success': (response) => {
-			if(!response.details.length > 0) hasLightMode = true;
+			console.log(response);
+			if(response.details.length > 0) {
+				hasLightMode = true;
+				document.querySelector('.settings-menu li i.locked').classList.add('inactive');
+			}
 		},
 		'failure': (response) => console.log(response)
 	});
@@ -147,11 +139,13 @@ function createEventHandlers() {
 		}
 		else {
 			// buy prompt
-			let sku = "com.ssparvez.dev_tab.light_mode";
 			google.payments.inapp.buy({
 				'parameters': {'env': 'prod'},
-				'sku': sku,
-				'success': () => hasLightMode = true,
+				'sku': "com.ssparvez.dev_tab.light_mode",
+				'success': () => {
+					hasLightMode = true
+					document.querySelector('.settings-menu li i.locked').classList.remove('inactive');
+				},
 				'failure': () => console.log('failure')
 			});
 		}

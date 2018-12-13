@@ -214,13 +214,13 @@ header.active + section .command-area {
 }
 
 .settings-menu li i.locked {
+  display: inline;
   color: #FFD740; 
   margin-left: 8px;
-  display: none;
 }
 
-.settings-menu li i.locked.active {
-  display: inline;
+.settings-menu li i.locked.inactive {
+  display: none;
 }
 
 

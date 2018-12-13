@@ -6,7 +6,7 @@
       "48": "assets/icon48.png",
       "128": "assets/icon128.png" 
     },
-    "version": "0.0.0.8",
+    "version": "0.0.0.10",
     "manifest_version": 2,
     "chrome_url_overrides" : {
       "newtab": "index.html"
