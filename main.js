@@ -20,16 +20,19 @@ function init() {
 
 function getTheme() {
 	chrome.storage.local.get("theme", value => {
-		theme = value;
-		document.querySelector(".theme-toggle").firstChild.innerHTML = (theme == "light" ? "Dark" : "Light") + " Mode";
-		document.body.dataset.theme = theme;
+		if(value.theme) {
+			console.log(value.theme);
+			theme = value.theme;
+			document.body.dataset.theme = theme;
+			document.querySelector(".theme-toggle").innerText = (theme == "light" ? "Dark" : "Light") + " Mode";
+		}
 	});
 
 	google.payments.inapp.getPurchases({
 		'parameters': {'env': 'prod'},
 		'success': (response) => {
 			console.log(response);
-			if(response.details.length > 0) {
+			if(response.response.details.length > 0) {
 				hasLightMode = true;
 				document.querySelector('.settings-menu li i.locked').classList.add('inactive');
 			}
@@ -45,13 +48,16 @@ function getSettings() {
 			document.querySelector(".hello").style.display = "none"
 			document.querySelector(".name-toggle").innerHTML = "Show Name";
 			showUsername = false;
-		} else userInput.value = values.username ? values.username : '';
+		} 
+		else userInput.value = values.username ? values.username : '';
+		
 		if (values.showTime === false) {
 			document.querySelector(".time").style.display = "none"
 			document.querySelector(".time-toggle").innerHTML = "Show Time";
 			showTime = false;
 		}
 		if (values.militaryTime) militaryTime = values.militaryTime;
+		
 		document.querySelector('header').setAttribute("class", "active");
 		document.querySelector('footer').setAttribute("class", "active");
 	});
@@ -130,11 +136,11 @@ function createEventHandlers() {
 
 	settingsOptions[3].addEventListener("click", () => {
 		if(hasLightMode) {
-			chrome.storage.local.set({
-				"theme": "light"
-			}, () => {});
 			theme = theme == "light" ? "dark" : "light";
-			settingsOptions[3].firstChild.innerHTML = (theme == "light" ? "Dark" : "Light") + " Mode";
+			chrome.storage.local.set({
+				"theme": theme
+			}, () => {});
+			settingsOptions[3].innerText = (theme == "light" ? "Dark" : "Light") + " Mode";
 			document.body.dataset.theme = theme;
 		}
 		else {
@@ -162,7 +168,7 @@ function processCommand(input) {
 		if (tokens[0] == "ls") {
 			for (let entry of bookmarks) {
 				if (!entry.children) {
-					output.response += "<a style=\"color: #F3F7A2;\" href=\"" + entry.url + "\">" + entry.title + "</a>\t"
+					output.response += "<a href=\"" + entry.url + "\">" + entry.title + "</a>\t"
 				}
 			}
 		} 
@@ -276,14 +282,13 @@ function addCommandElements(input, output) {
 
 	// add command item node
 	const command = document.createElement("div");
-	command.className = "command";
+	command.className = "command " + (output.success ? "success" : "error");
 	command.innerHTML = input.value;
-	command.style.color = output.success ? "#0fa" : "#f07";
 	list.appendChild(command);
 
 	// add command response
 	const response = document.createElement("div");
-	response.className = "response";
+	response.className = "response " + (output.success ? "success" : "error");
 	response.innerHTML = output.success ? output.response : ("- lineTab: " + output.response);
 	list.appendChild(response);
 

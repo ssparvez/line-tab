@@ -4,7 +4,8 @@ body[data-theme='light'] {
 }
 body[data-theme='light'] header,
 body[data-theme='light'] .hello input,
-body[data-theme='light'] footer {
+body[data-theme='light'] footer,
+body[data-theme='light'] .command-bar input {
   color: #212121 !important;
 }
 body[data-theme='light'] .command-area,
@@ -96,6 +97,10 @@ header.active + section .command-area {
   box-shadow: 0 10px 20px rgba(0,0,0,0.19), 0 6px 6px rgba(0,0,0,0.23);
 }
 
+.command-area a {
+  color: #09f;
+}
+
 .command-list {
   height: 334px;
   overflow-y: scroll;
@@ -152,6 +157,18 @@ header.active + section .command-area {
 
 .command-list::-webkit-scrollbar-thumb {
   background-color: #18ffff;
+}
+
+.command-list .command.success {
+  color: #0fa;
+}
+
+.command-list .command.error {
+  color: #f07;
+}
+
+.command-list .response.error {
+  color: rgba(0,0,0,0.6);
 }
 
 .settings-button {
