@@ -256,7 +256,7 @@ function createHelpResponse() {
 	response += "\nclear\t\t\t\tremoves all previous output"
 	response += "\nexit\t\t\t\tcloses this tab"
 	response += "\n\nOptions:"
-	response += "\n-n\t\t\t\t Runs command in a new tab"
+	response += "\n-n\t\t\t\t runs command in a new tab"
 	return response;
 }
 
