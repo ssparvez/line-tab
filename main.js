@@ -5,8 +5,8 @@ let showUsername = true;
 let showTime = true;
 let showCommandArea = true;
 let militaryTime = false;
-let hasLightMode = false;
-let theme = 'dark';
+let hasDarkMode = false;
+let theme = 'white';
 
 init();
 
@@ -33,7 +33,7 @@ function getTheme() {
 		'success': (response) => {
 			console.log(response);
 			if(response.response.details.length > 0) {
-				hasLightMode = true;
+				hasDarkMode = true;
 				document.querySelector('.settings-menu li i.locked').classList.add('inactive');
 			}
 		},
@@ -135,7 +135,7 @@ function createEventHandlers() {
 	})
 
 	settingsOptions[3].addEventListener("click", () => {
-		if(hasLightMode) {
+		if(hasDarkMode) {
 			theme = theme == "light" ? "dark" : "light";
 			chrome.storage.local.set({
 				"theme": theme
@@ -149,7 +149,7 @@ function createEventHandlers() {
 				'parameters': {'env': 'prod'},
 				'sku': "com.ssparvez.dev_tab.light_mode",
 				'success': () => {
-					hasLightMode = true
+					hasDarkMode = true
 					document.querySelector('.settings-menu li i.locked').classList.remove('inactive');
 				},
 				'failure': () => console.log('failure')
@@ -244,7 +244,7 @@ function processCommand(input) {
 }
 
 function createHelpResponse() {
-	let response = "Welcome to lineTab! A fun way to browse.";
+	let response = "Welcome to Line Tab! A fun way to browse.";
 	response += "\n\nAvailable commands:";
 	response += "\nhelp\t\t\t\tbrings up this list"
 	response += "\nls\t\t\t\tlists your primary bookmarks"
@@ -289,7 +289,7 @@ function addCommandElements(input, output) {
 	// add command response
 	const response = document.createElement("div");
 	response.className = "response " + (output.success ? "success" : "error");
-	response.innerHTML = output.success ? output.response : ("- lineTab: " + output.response);
+	response.innerHTML = output.success ? output.response : ("- Line Tab: " + output.response);
 	list.appendChild(response);
 
 	// scroll to bottom if isScrolledToBotto
